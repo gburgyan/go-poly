@@ -5,30 +5,6 @@ import (
 	"testing"
 )
 
-type TypeString struct {
-	ValueA string
-}
-
-type TypeFloat struct {
-	ValueB float32
-}
-
-type TypeInt struct {
-	ValueC int
-	Index  int
-}
-
-func (t *TypeInt) SetIndex(i int) {
-	t.Index = i
-}
-
-type SlicesAB struct {
-	TypeString []TypeString
-	TypeBravo  []TypeFloat `poly:"TypeFloat"`
-	TypeInt    TypeInt
-	TypeIntP   *TypeInt
-}
-
 func TestUnmarshallPoly(t *testing.T) {
 	in := `
 [
@@ -49,7 +25,7 @@ func TestUnmarshallPoly(t *testing.T) {
 		"ValueC": 123
 	}
 ]`
-	var result SlicesAB
+	var result SlicesABC
 
 	err := UnmarshallPoly([]byte(in), &result)
 	assert.NoError(t, err)

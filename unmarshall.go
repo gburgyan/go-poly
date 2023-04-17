@@ -51,10 +51,10 @@ func (t *GenericTypeLocator) TypeName() string {
 	return ""
 }
 
-// Indexable is an interface that you should implement if you need to know the
+// IndexSettable is an interface that you should implement if you need to know the
 // index into the array of JSON sub-objects. This should be implemented by the
 // types that are referred to by the TypeLocator.
-type Indexable interface {
+type IndexSettable interface {
 	// SetIndex is called with the zero-based index into the JSON sub-object.
 	// In cases where there are sub-objects that cannot be unmarshalled, those
 	// still count in the indexing.
@@ -139,9 +139,9 @@ func UnmarshallPolyCustomType(rawJson []byte, target any, typeLocator reflect.Ty
 				return err
 			}
 
-			// If that object implements the Indexable interface, let it know the
+			// If that object implements the IndexSettable interface, let it know the
 			// index from which it was read from.
-			if indexable, ok := newSubObj.(Indexable); ok {
+			if indexable, ok := newSubObj.(IndexSettable); ok {
 				indexable.SetIndex(i)
 			}
 
@@ -165,6 +165,8 @@ func UnmarshallPolyCustomType(rawJson []byte, target any, typeLocator reflect.Ty
 	return nil
 }
 
+// makeTargetFieldLookup describes the target and the fields that are
+// available for mapping things into.
 func makeTargetFieldLookup(target any) (map[string]fieldLookup, error) {
 	fields := map[string]fieldLookup{}
 	targetTypePtr := reflect.TypeOf(target)
@@ -202,6 +204,8 @@ func makeTargetFieldLookup(target any) (map[string]fieldLookup, error) {
 	return fields, nil
 }
 
+// unmarshallTypeMap takes the raw JSON input and unmarshalls it into a slice
+// of typeLocator and returns that slice.
 func unmarshallTypeMap(rawJson []byte, typeLocator reflect.Type) (reflect.Value, error) {
 	// Verify that the typeLocator is suitable.
 	if !reflect.PointerTo(typeLocator).AssignableTo(typeLocatorType) {
@@ -219,6 +223,7 @@ func unmarshallTypeMap(rawJson []byte, typeLocator reflect.Type) (reflect.Value,
 	return slicePtr.Elem(), nil
 }
 
+// unmarshallSubArrays unmarshalls the raw JSON into its constituent sub-parts.
 func unmarshallSubArrays(rawJson []byte) ([]json.RawMessage, error) {
 	var subJSONs []json.RawMessage
 	err := json.Unmarshal(rawJson, &subJSONs)
