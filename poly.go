@@ -69,10 +69,33 @@ type fieldLookup struct {
 	ptr       bool
 }
 
+// UnmarshallPoly takes a byte slice that is a JSON array, and unmarshalls the
+// JSON into the target. For each array element of the input JSON, it determines
+// what member of the target to unmarshall into based on the type of each
+// sub-item. The determination is made by looking of the type name in the named
+// members of the target. If a deviation needs to be made in the naming, the
+// `poly:name` tag can be added to the field. If the field in the target is a
+// slice, then all objects will be appended to that slice. If it is a simple
+// value type, then it's simply assigned to that field; if there are multiple
+// values that get assigned to a scalar, the last one in the input will win. The
+// determination of type is made by a GenericTypeLocator which has common type
+// designators already defined. If a custom way to deal with this is needed, use
+// UnmarshallPolyCustomType.
 func UnmarshallPoly(rawJson []byte, target any) error {
 	return UnmarshallPolyCustomType(rawJson, target, DefaultLocator)
 }
 
+// UnmarshallPolyCustomType takes a byte slice that is a JSON array, and
+// unmarshalls the JSON into the target. For each array element of the input
+// JSON, it determines what member of the target to unmarshall into based on the
+// type of each sub-item. The determination is made by looking of the type name
+// in the named members of the target. If a deviation needs to be made in the
+// naming, the `poly:name` tag can be added to the field. If the field in the
+// target is a slice, then all objects will be appended to that slice. If it is a
+// simple value type, then it's simply assigned to that field; if there are
+// multiple values that get assigned to a scalar, the last one in the input will
+// win. The passed in typeLocator is used to determine what the type names
+// are of each sub-object in the JSON array.
 func UnmarshallPolyCustomType(rawJson []byte, target any, typeLocator reflect.Type) error {
 	targetFields, err := makeTargetFieldLookup(target)
 	if err != nil {
