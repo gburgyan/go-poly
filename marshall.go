@@ -11,17 +11,16 @@ type IndexGettable interface {
 	GetIndex() int
 }
 
-// MarshallPoly is a function that takes an input object of any type and
-// serializes it into a JSON byte array. The function flattens the input object
-// by extracting its fields and appending them to a slice. For fields of slice
-// types, the function appends individual non-zero elements of the slice to the
-// resulting flattened slice. The function also sorts the flattened slice based
-// on the index of the elements if they implement the IndexGettable interface
-// which can be used to control the ordering of the resultant JSON objects.
-// If there are multiple objects that have the same index, they are sorted together
-// with the internal order based on when they were first encountered. Any
-// object that does not implement the IndexGettable interface will be sorted to
-// the end using the same rules.
+// MarshallPoly takes an input object of any type and serializes it into a JSON
+// byte array. The function flattens the input object by extracting its fields
+// and appending them to a slice. For fields of slice types, the function appends
+// individual non-zero elements of the slice to the resulting flattened slice.
+// The function also sorts the flattened slice based on the index of the elements
+// if they implement the IndexGettable interface which can be used to control the
+// ordering of the resultant JSON objects. If there are multiple objects that
+// have the same index, they are sorted together with the internal order based on
+// when they were first encountered. Any object that does not implement the
+// IndexGettable interface will be sorted to the end using the same rules.
 //
 // Note that this only serialized the objects to JSON using the default JSON
 // marshalling. This means that if you want to have a JSON value that can be used
@@ -49,16 +48,16 @@ func MarshallPoly(obj any) ([]byte, error) {
 	return json.Marshal(flattenedObjs)
 }
 
-// FlattenPoly is a function that takes an input object of any type and flattens
-// the input object by extracting its fields and appending them to a slice. For
-// fields of slice types, the function appends individual non-zero elements of
-// the slice to the resulting flattened slice. The function also sorts the
-// flattened slice based on the index of the elements if they implement the
-// IndexGettable interface which can be used to control the ordering of the
-// resultant JSON objects. If there are multiple objects that have the same
-// index, they are sorted together with the internal order based on when they
-// were first encountered. Any object that does not implement the IndexGettable
-// interface will be sorted to the end using the same rules.
+// FlattenPoly takes an input object of any type and flattens the input object by
+// extracting its fields and appending them to a slice. For fields of slice
+// types, the function appends individual non-zero elements of the slice to the
+// resulting flattened slice. The function also sorts the flattened slice based
+// on the index of the elements if they implement the IndexGettable interface
+// which can be used to control the ordering of the resultant JSON objects. If
+// there are multiple objects that have the same index, they are sorted together
+// with the internal order based on when they were first encountered. Any object
+// that does not implement the IndexGettable interface will be sorted to the end
+// using the same rules.
 //
 // This does not marshall them into JSON, unlike MarshallPoly, and can be used
 // if there is a need to do any custom JSON serialization by your own code.

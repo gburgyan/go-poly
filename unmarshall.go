@@ -105,13 +105,13 @@ func UnmarshallPoly(rawJson []byte, target any) error {
 	return UnmarshallPolyCustomType(rawJson, target, DefaultLocator)
 }
 
-// UnmarshallPolyCustomType is a function that takes a raw JSON byte slice, a target any
-// type variable, and a typeLocator of type reflect.Type. It unmarshalls the JSON into
+// UnmarshallPolyCustomType takes a raw JSON byte slice, a target any type
+// variable, and a typeLocator of type reflect.Type. It unmarshalls the JSON into
 // the target variable based on the custom type polymorphism rules defined by the
-// typeLocator. The target variable should be a struct with fields tagged with their
-// respective polymorphic type names. The typeLocator should be a struct implementing
-// the TypeLocator interface which returns a type name for the current object. If an
-// error occurs during unmarshalling, it returns an error.
+// typeLocator. The target variable should be a struct with fields tagged with
+// their respective polymorphic type names. The typeLocator should be a struct
+// implementing the TypeLocator interface which returns a type name for the
+// current object. If an error occurs during unmarshalling, it returns an error.
 //
 // Example usage:
 //
