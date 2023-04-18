@@ -7,8 +7,6 @@ import (
 	"testing"
 )
 
-var indexGettableType = reflect.TypeOf([]IndexGettable{}).Elem()
-
 func TestMarshallPoly(t *testing.T) {
 	in := SlicesABC{
 		TypeString: []TypeString{

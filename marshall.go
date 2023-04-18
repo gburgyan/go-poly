@@ -11,6 +11,8 @@ type IndexGettable interface {
 	GetIndex() int
 }
 
+var indexGettableType = reflect.TypeOf([]IndexGettable{}).Elem()
+
 // MarshallPoly takes an input object of any type and serializes it into a JSON
 // byte array. The function flattens the input object by extracting its fields
 // and appending them to a slice. For fields of slice types, the function appends
@@ -84,6 +86,8 @@ func FlattenPoly(obj any) []any {
 		sourceValue = sourceValue.Elem()
 	}
 
+	needToSort := false
+
 	for i := 0; i < sourceType.NumField(); i++ {
 		field := sourceType.Field(i)
 		fieldType := field.Type
@@ -110,26 +114,35 @@ func FlattenPoly(obj any) []any {
 			for i := 0; i < fieldValue.Len(); i++ {
 				sliceVal := fieldValue.Index(i)
 				if !sliceVal.IsZero() {
+					if sliceVal.CanConvert(indexGettableType) {
+						needToSort = true
+					}
 					flattenedObjs = append(flattenedObjs, sliceVal.Interface())
 				}
 			}
 		} else {
 			if !zeroObj {
+				if fieldValue.CanConvert(indexGettableType) {
+					needToSort = true
+				}
 				flattenedObjs = append(flattenedObjs, fieldValue.Interface())
 			}
 		}
 	}
 
-	sort.SliceStable(flattenedObjs, func(i, j int) bool {
-		ii := math.MaxInt
-		ij := math.MaxInt
-		if indexer, ok := flattenedObjs[i].(IndexGettable); ok {
-			ii = indexer.GetIndex()
-		}
-		if indexer, ok := flattenedObjs[j].(IndexGettable); ok {
-			ii = indexer.GetIndex()
-		}
-		return ii < ij
-	})
+	if needToSort {
+		sort.SliceStable(flattenedObjs, func(i, j int) bool {
+			ii := math.MaxInt
+			ij := math.MaxInt
+			if indexer, ok := flattenedObjs[i].(IndexGettable); ok {
+				ii = indexer.GetIndex()
+			}
+			if indexer, ok := flattenedObjs[j].(IndexGettable); ok {
+				ii = indexer.GetIndex()
+			}
+			return ii < ij
+		})
+	}
+
 	return flattenedObjs
 }
