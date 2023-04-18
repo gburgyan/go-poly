@@ -84,16 +84,19 @@ type fieldLookup struct {
 // returns an error.
 //
 // Example usage:
-// type Dog struct { ... }
-// type Cat struct { ... }
 //
-//	type Result struct {
-//	    Dogs []Dog `poly:"dog"`
-//	    Cats []Cat `poly:"cat"`
-//	}
+//		type Dog struct { ... }
+//		type Cat struct { ... }
+//		type Owner struct { ... }
 //
-// var result Result
-// err := UnmarshallPoly(jsonData, &result)
+//		type Result struct {
+//		    Dogs  []Dog `poly:"dog"`
+//		    Cats  []Cat `poly:"cat"`
+//	     	Owner Owner `poly:"owner"`
+//		}
+//
+//		var result Result
+//		err := UnmarshallPoly(jsonData, &result)
 //
 // In this example, the UnmarshallPoly function would unmarshall the JSON into the
 // Result struct, populating the Dogs and Cats slices based on the polymorphic type
@@ -111,19 +114,22 @@ func UnmarshallPoly(rawJson []byte, target any) error {
 // error occurs during unmarshalling, it returns an error.
 //
 // Example usage:
-// type Dog struct { ... }
-// type Cat struct { ... }
 //
-// type AnimalTypeLocator struct { ... }
-// func (tl *AnimalTypeLocator) TypeName() string { ... }
+//		type Dog struct { ... }
+//		type Cat struct { ... }
+//		type Owner struct { ... }
 //
-//	type Result struct {
-//	    Dogs []Dog `poly:"dog"`
-//	    Cats []Cat `poly:"cat"`
-//	}
+//		type AnimalTypeLocator struct { ... }
+//		func (tl *AnimalTypeLocator) TypeName() string { ... }
 //
-// var result Result
-// err := UnmarshallPolyCustomType(jsonData, &result, reflect.Type(AnimalTypeLocator{})
+//		type Result struct {
+//		    Dogs  []Dog `poly:"dog"`
+//		    Cats  []Cat `poly:"cat"`
+//	  	    Owner Owner `poly:"owner"`
+//		}
+//
+//		var result Result
+//		err := UnmarshallPolyCustomType(jsonData, &result, reflect.Type(AnimalTypeLocator{})
 //
 // In this example, the UnmarshallPolyCustomType function would unmarshall the JSON
 // into the Result struct, populating the Dogs and Cats slices based on the polymorphic
@@ -210,13 +216,14 @@ func UnmarshallPolyCustomType(rawJson []byte, target any, typeLocator reflect.Ty
 //
 // Example usage:
 //
-//	type Result struct {
-//	    Dogs []Dog `poly:"dog"`
-//	    Cats []Cat `poly:"cat"`
-//	}
+//		type Result struct {
+//		    Dogs  []Dog `poly:"dog"`
+//		    Cats  []Cat `poly:"cat"`
+//	     	Owner Owner `poly:"owner"`
+//		}
 //
-// fields, err := makeTargetFieldLookup(&Result{})
-// // fields is a map containing fieldLookup structs for the "dog" and "cat" types.
+//		fields, err := makeTargetFieldLookup(&Result{})
+//		// fields is a map containing fieldLookup structs for the "dog," "cat," and "own types.
 //
 // The returned map would have two entries, one for the "dog" type and one for the "cat"
 // type. Each entry would contain a fieldLookup struct with information about the
