@@ -223,7 +223,7 @@ func UnmarshallPolyCustomType(rawJson []byte, target any, typeLocator reflect.Ty
 //		}
 //
 //		fields, err := makeTargetFieldLookup(&Result{})
-//		// fields is a map containing fieldLookup structs for the "dog," "cat," and "own types.
+//		// fields is a map containing fieldLookup structs for the "dog," "cat," and "owner" types.
 //
 // The returned map would have two entries, one for the "dog" type and one for the "cat"
 // type. Each entry would contain a fieldLookup struct with information about the
