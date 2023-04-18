@@ -74,13 +74,6 @@ func MarshallPoly(obj any) ([]byte, error) {
 // Returns:
 // - ([]any): A flattened representation of the input object with all the
 // fields of the original object returned as a slice.
-//
-// The function is designed to be flexible and support a wide range of input
-// types. The resulting JSON byte array is a representation of the input object's
-// fields and their values, with nested structures being flattened and sorted
-// based on the index provided by the IndexGettable interface. This function is
-// useful for situations where a more compact or custom JSON representation is
-// desired for complex data structures.
 func FlattenPoly(obj any) []any {
 	var flattenedObjs []any
 
