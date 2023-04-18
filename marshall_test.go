@@ -3,8 +3,11 @@ package poly
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 )
+
+var indexGettableType = reflect.TypeOf([]IndexGettable{}).Elem()
 
 func TestMarshallPoly(t *testing.T) {
 	in := SlicesABC{
@@ -38,15 +41,22 @@ func TestMarshallPoly(t *testing.T) {
 	assert.NoError(t, err)
 	s := string(bytes)
 	fmt.Println(s)
+}
 
-	a := &TypeInt{
+func TestReflectNonPointerInterface(t *testing.T) {
+	a := TypeInt{
 		ValueC: 42,
 		index:  1,
 	}
 
-	var aa any
-	aa = a
+	at := reflect.TypeOf(a)
+	av := reflect.ValueOf(a)
 
-	aaa := aa.(IndexGettable)
-	fmt.Println(aaa.GetIndex())
+	pav := reflect.New(at)
+	pav.Elem().Set(av)
+
+	igv := pav.Convert(indexGettableType)
+	i := igv.Interface().(IndexGettable)
+
+	fmt.Println(i.GetIndex())
 }

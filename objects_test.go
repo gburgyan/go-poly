@@ -17,7 +17,7 @@ func (t *TypeInt) SetIndex(i int) {
 	t.index = i
 }
 
-func (t TypeInt) GetIndex() int {
+func (t *TypeInt) GetIndex() int {
 	return t.index
 }
 
