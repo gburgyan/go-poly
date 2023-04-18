@@ -44,6 +44,44 @@ type IndexGettable interface {
 // useful for situations where a more compact or custom JSON representation is
 // desired for complex data structures.
 func MarshallPoly(obj any) ([]byte, error) {
+	flattenedObjs := FlattenPoly(obj)
+
+	return json.Marshal(flattenedObjs)
+}
+
+// FlattenPoly is a function that takes an input object of any type and flattens
+// the input object by extracting its fields and appending them to a slice. For
+// fields of slice types, the function appends individual non-zero elements of
+// the slice to the resulting flattened slice. The function also sorts the
+// flattened slice based on the index of the elements if they implement the
+// IndexGettable interface which can be used to control the ordering of the
+// resultant JSON objects. If there are multiple objects that have the same
+// index, they are sorted together with the internal order based on when they
+// were first encountered. Any object that does not implement the IndexGettable
+// interface will be sorted to the end using the same rules.
+//
+// This does not marshall them into JSON, unlike MarshallPoly, and can be used
+// if there is a need to do any custom JSON serialization by your own code.
+//
+// As in MarshallPoly, the objects, when serialized to JSON by your code will
+// need to have a field indicating the polymorphic type if you need that represented
+// in the output JSON.
+//
+// Parameters:
+// - obj (any): The input object to be serialized. This can be a
+// value or a pointer of any type.
+//
+// Returns:
+// - ([]any): A flattened representation of the input object with all the
+// fields of the original object returned as a slice.
+//
+// The function is designed to be flexible and support a wide range of input
+// types. The resulting JSON byte array is a representation of the input object's
+// fields and their values, with nested structures being flattened and sorted
+// based on the index provided by the IndexGettable interface. This function is
+// useful for situations where a more compact or custom JSON representation is
+// desired for complex data structures.
+func FlattenPoly(obj any) []any {
 	var flattenedObjs []any
 
 	sourceType := reflect.TypeOf(obj)
@@ -101,6 +139,5 @@ func MarshallPoly(obj any) ([]byte, error) {
 		}
 		return ii < ij
 	})
-
-	return json.Marshal(flattenedObjs)
+	return flattenedObjs
 }
