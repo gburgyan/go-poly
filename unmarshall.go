@@ -88,8 +88,8 @@ type fieldLookup struct {
 // type Cat struct { ... }
 //
 //	type Result struct {
-//	    Dogs []Dog polymorphic:"dog"
-//	    Cats []Cat polymorphic:"cat"
+//	    Dogs []Dog `poly:"dog"`
+//	    Cats []Cat `poly:"cat"`
 //	}
 //
 // var result Result
