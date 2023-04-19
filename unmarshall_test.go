@@ -31,7 +31,7 @@ func TestUnmarshallPoly(t *testing.T) {
 ]`
 	var result SlicesABC
 
-	err := UnmarshallPoly([]byte(in), &result)
+	err := Unmarshall([]byte(in), &result)
 	assert.NoError(t, err)
 
 	assert.Len(t, result.TypeString, 2)

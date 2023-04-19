@@ -35,7 +35,7 @@ func TestMarshallPoly(t *testing.T) {
 		},
 	}
 
-	bytes, err := MarshallPoly(in)
+	bytes, err := Marshall(in)
 	assert.NoError(t, err)
 	s := string(bytes)
 	fmt.Println(s)

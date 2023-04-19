@@ -69,17 +69,17 @@ type fieldLookup struct {
 	ptr       bool
 }
 
-// UnmarshallPoly is a convenience function that takes a raw JSON byte slice and a
-// target any type variable, and unmarshalls the JSON into the target variable based
-// on the default polymorphism rules. The target variable should be a struct with
-// fields tagged with their respective polymorphic type names. The default polymorphism
-// rules are defined by the DefaultLocator, which implements some common polymorphic
-// type resolutions using "type", "@type", "Type", and "@Type" as the keys to determine
-// the type of object based on the JSON. If your needs are different, you can define
-// a custom TypeLocator which handles the type resolution in whatever way is needed
-// for your application.
+// Unmarshall is a convenience function that takes a raw JSON byte slice and a
+// target any type variable, and unmarshalls the JSON into the target variable
+// based on the default polymorphism rules. The target variable should be a
+// struct with fields tagged with their respective polymorphic type names. The
+// default polymorphism rules are defined by the DefaultLocator, which implements
+// some common polymorphic type resolutions using "type", "@type", "Type", and
+// "@Type" as the keys to determine the type of object based on the JSON. If your
+// needs are different, you can define a custom TypeLocator which handles the
+// type resolution in whatever way is needed for your application.
 //
-// This function is a wrapper around UnmarshallPolyCustomType, using the
+// This function is a wrapper around UnmarshallCustom, using the
 // DefaultLocator for type resolution. If an error occurs during unmarshalling, it
 // returns an error.
 //
@@ -96,18 +96,18 @@ type fieldLookup struct {
 //		}
 //
 //		var result Result
-//		err := UnmarshallPoly(jsonData, &result)
+//		err := Unmarshall(jsonData, &result)
 //
-// In this example, the UnmarshallPoly function would unmarshall the JSON into the
+// In this example, the Unmarshall function would unmarshall the JSON into the
 // Result struct, populating the Dogs and Cats slices based on the polymorphic type
 // names defined in the DefaultLocator struct.
-func UnmarshallPoly(rawJson []byte, target any) error {
-	return UnmarshallPolyCustomType(rawJson, target, DefaultLocator)
+func Unmarshall(rawJson []byte, target any) error {
+	return UnmarshallCustom(rawJson, target, DefaultLocator)
 }
 
-// UnmarshallPolyCustomType takes a raw JSON byte slice, a target any type
-// variable, and a typeLocator of type reflect.Type. It unmarshalls the JSON into
-// the target variable based on the custom type polymorphism rules defined by the
+// UnmarshallCustom takes a raw JSON byte slice, a target any type variable, and
+// a typeLocator of type reflect.Type. It unmarshalls the JSON into the target
+// variable based on the custom type polymorphism rules defined by the
 // typeLocator. The target variable should be a struct with fields tagged with
 // their respective polymorphic type names. The typeLocator should be a struct
 // implementing the TypeLocator interface which returns a type name for the
@@ -129,12 +129,12 @@ func UnmarshallPoly(rawJson []byte, target any) error {
 //		}
 //
 //		var result Result
-//		err := UnmarshallPolyCustomType(jsonData, &result, reflect.Type(AnimalTypeLocator{})
+//		err := UnmarshallCustom(jsonData, &result, reflect.Type(AnimalTypeLocator{})
 //
-// In this example, the UnmarshallPolyCustomType function would unmarshall the JSON
+// In this example, the UnmarshallCustom function would unmarshall the JSON
 // into the Result struct, populating the Dogs and Cats slices based on the polymorphic
 // type names defined in the TypeLocator struct.
-func UnmarshallPolyCustomType(rawJson []byte, target any, typeLocator reflect.Type) error {
+func UnmarshallCustom(rawJson []byte, target any, typeLocator reflect.Type) error {
 	targetFields, err := makeTargetFieldLookup(target)
 	if err != nil {
 		return err
@@ -210,7 +210,7 @@ func UnmarshallPolyCustomType(rawJson []byte, target any, typeLocator reflect.Ty
 // the default type name if no tag is provided. If the target variable is not a
 // pointer, the function returns an error along with an empty map.
 //
-// This function is used internally by UnmarshallPolyCustomType to create a lookup
+// This function is used internally by UnmarshallCustom to create a lookup
 // table for target struct fields, allowing it to efficiently match and unmarshal
 // JSON objects into the appropriate target fields based on their polymorphic type names.
 //
@@ -272,7 +272,7 @@ func makeTargetFieldLookup(target any) (map[string]fieldLookup, error) {
 // should be a reflect.Type implementing the TypeLocator interface. If an error occurs
 // during unmarshalling, it returns an error along with an empty reflect.Value.
 //
-// This function is used internally by UnmarshallPolyCustomType to determine the
+// This function is used internally by UnmarshallCustom to determine the
 // polymorphic type names for each object in the JSON.
 func unmarshallTypeMap(rawJson []byte, typeLocator reflect.Type) (reflect.Value, error) {
 	// Verify that the typeLocator is suitable.
@@ -296,7 +296,7 @@ func unmarshallTypeMap(rawJson []byte, typeLocator reflect.Type) (reflect.Value,
 // to an object in the input JSON array. If an error occurs during unmarshalling, it
 // returns an error along with an empty slice.
 //
-// This function is used internally by UnmarshallPolyCustomType to extract the JSON
+// This function is used internally by UnmarshallCustom to extract the JSON
 // objects for each sub-object, which will later be unmarshalled into the appropriate
 // target fields based on their polymorphic type names.
 func unmarshallSubArrays(rawJson []byte) ([]json.RawMessage, error) {
