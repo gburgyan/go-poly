@@ -13,15 +13,19 @@ func TestUnmarshallPoly(t *testing.T) {
 		"ValueA": "ValueString"
 	},
 	{
+		"type": "TypeString",
+		"ValueA": "ValueString2"
+	},
+	{
 		"@type": "TypeFloat",
 		"ValueB": 42.23
 	},
 	{
-		"@type": "TypeInt",
+		"Type": "TypeInt",
 		"ValueC": 105
 	},
 	{
-		"@type": "TypeIntP",
+		"@Type": "TypeIntP",
 		"ValueC": 123
 	}
 ]`
@@ -30,6 +34,13 @@ func TestUnmarshallPoly(t *testing.T) {
 	err := UnmarshallPoly([]byte(in), &result)
 	assert.NoError(t, err)
 
-	assert.Len(t, result.TypeString, 1)
+	assert.Len(t, result.TypeString, 2)
+	assert.Equal(t, "ValueString", result.TypeString[0].ValueA)
+	assert.Equal(t, "ValueString2", result.TypeString[1].ValueA)
 	assert.Len(t, result.TypeBravo, 1)
+	assert.Equal(t, float32(42.23), result.TypeBravo[0].ValueB)
+	assert.Equal(t, 105, result.TypeInt.ValueC)
+	assert.Equal(t, 3, result.TypeInt.index)
+	assert.Equal(t, 123, result.TypeIntP.ValueC)
+	assert.Equal(t, 4, result.TypeIntP.index)
 }
