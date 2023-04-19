@@ -1,9 +1,7 @@
 package poly
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
-	"reflect"
 	"testing"
 )
 
@@ -37,24 +35,9 @@ func TestMarshallPoly(t *testing.T) {
 
 	bytes, err := Marshall(in)
 	assert.NoError(t, err)
-	s := string(bytes)
-	fmt.Println(s)
-}
+	assert.Equal(t, `[{"ValueC":105},{"ValueC":23},{"ValueA":"A"},{"ValueA":"B"},{"ValueB":42},{"ValueB":43}]`, string(bytes))
 
-func TestReflectNonPointerInterface(t *testing.T) {
-	a := TypeInt{
-		ValueC: 42,
-		index:  1,
-	}
-
-	at := reflect.TypeOf(a)
-	av := reflect.ValueOf(a)
-
-	pav := reflect.New(at)
-	pav.Elem().Set(av)
-
-	igv := pav.Convert(indexGettableType)
-	i := igv.Interface().(IndexGettable)
-
-	fmt.Println(i.GetIndex())
+	bytes, err = Marshall(&in) // Try with pointer
+	assert.NoError(t, err)
+	assert.Equal(t, `[{"ValueC":105},{"ValueC":23},{"ValueA":"A"},{"ValueA":"B"},{"ValueB":42},{"ValueB":43}]`, string(bytes))
 }

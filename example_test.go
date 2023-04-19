@@ -2,7 +2,6 @@ package poly
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -74,20 +73,68 @@ func TestExampleUnmarshall(t *testing.T) {
     "type": "water",
     "provider": "Public City Water"
   }
-]
-`
+]`
 
 	// First do it manually using the library Unmarshall function
 	r := Residence{}
 	err := Unmarshall([]byte(in), &r)
 	assert.NoError(t, err)
+	assert.Equal(t, "123 Main", r.Location.Address)
+	assert.Len(t, r.People, 2)
+	assert.Equal(t, "John", r.People[0].Name)
+	assert.Equal(t, "Mary", r.People[1].Name)
+	assert.Len(t, r.Pets, 2)
+	assert.Equal(t, "Rover", r.Pets[0].Name)
+	assert.Equal(t, "Fluffy", r.Pets[1].Name)
+	assert.Equal(t, "Public City Water", r.Water.Provider)
 
 	// Now, see how this works with the custom implementation of the json.UnmarshallJSON function
 	r2 := Residence{}
 	err = json.Unmarshal([]byte(in), &r2)
 	assert.NoError(t, err)
+	assert.Equal(t, "123 Main", r2.Location.Address)
+	assert.Len(t, r2.People, 2)
+	assert.Equal(t, "John", r2.People[0].Name)
+	assert.Equal(t, "Mary", r2.People[1].Name)
+	assert.Len(t, r2.Pets, 2)
+	assert.Equal(t, "Rover", r2.Pets[0].Name)
+	assert.Equal(t, "Fluffy", r2.Pets[1].Name)
+	assert.Equal(t, "Public City Water", r2.Water.Provider)
 
-	m2bytes, err := json.Marshal(r2)
+	// Now use the json.MarshalIndent to marshall the r2 object back to JSON. This should
+	// invoke the MarshalJSON receiver function above to apply the custom polymorphic
+	// marshalling.
+	marshalledBytes, err := json.MarshalIndent(r2, "", "  ")
 	assert.NoError(t, err)
-	fmt.Println(string(m2bytes))
+
+	// Note that this does *not* include the type fields in the result JSON. If you need
+	// the types emitted, then you need to add fields to the structs and set them appropriately.
+	expected := `[
+  {
+    "address": "123 Main"
+  },
+  {
+    "name": "John",
+    "occupation": "Teacher",
+    "age": 35
+  },
+  {
+    "name": "Mary",
+    "occupation": "Programmer",
+    "age": 33
+  },
+  {
+    "name": "Rover",
+    "species": "dog"
+  },
+  {
+    "name": "Fluffy",
+    "species": "cat"
+  },
+  {
+    "provider": "Public City Water"
+  }
+]`
+	assert.Equal(t, expected, string(marshalledBytes))
+
 }

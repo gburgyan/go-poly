@@ -135,6 +135,10 @@ func Unmarshall(rawJson []byte, target any) error {
 // into the Result struct, populating the Dogs and Cats slices based on the polymorphic
 // type names defined in the TypeLocator struct.
 func UnmarshallCustom(rawJson []byte, target any, typeLocator reflect.Type) error {
+	if len(rawJson) == 0 {
+		return nil
+	}
+
 	targetFields, err := makeTargetFieldLookup(target)
 	if err != nil {
 		return err
@@ -147,6 +151,7 @@ func UnmarshallCustom(rawJson []byte, target any, typeLocator reflect.Type) erro
 
 	subJSONs, err := unmarshallSubArrays(rawJson)
 	if err != nil {
+		// We should never hit this because we've previously unmarshalled the type map above.
 		return err
 	}
 
@@ -303,6 +308,8 @@ func unmarshallSubArrays(rawJson []byte) ([]json.RawMessage, error) {
 	var subJSONs []json.RawMessage
 	err := json.Unmarshal(rawJson, &subJSONs)
 	if err != nil {
+		// We should never get here because the code flow would have already unmarshalled this
+		// in a different way earlier.
 		return nil, err
 	}
 	return subJSONs, nil
