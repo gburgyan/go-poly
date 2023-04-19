@@ -10,8 +10,10 @@
 ## Features
 
 - Easy marshalling and unmarshalling of polymorphic JSON
-- Support for custom types and interfaces
+- Support for custom types
 - Minimal dependencies and efficient performance
+- Flexible usage patterns
+- Does not lose any context from the original, even indexes are preserved
 
 ## Installation
 
