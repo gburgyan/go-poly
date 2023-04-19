@@ -1,6 +1,6 @@
 # go-poly
 
-[![Build Status](https://github.com/gburgyan/go-poly/workflows/CI/badge.svg)](https://github.com/gburgyan/go-poly/actions)
+[![Build Status](https://github.com/gburgyan/go-poly/actions/workflows/go.yml/badge.svg)](https://github.com/gburgyan/go-poly/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gburgyan/go-poly)](https://goreportcard.com/report/github.com/gburgyan/go-poly)
 [![GoDoc](https://pkg.go.dev/badge/github.com/gburgyan/go-poly)](https://pkg.go.dev/github.com/gburgyan/go-poly)
 [![License](https://img.shields.io/github/license/gburgyan/go-poly)](LICENSE)
