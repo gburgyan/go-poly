@@ -106,6 +106,22 @@ type WaterService struct {
 }
 ```
 
+You can then unmarshall the JSON into your object by:
+
+```go
+var residence Residence
+err := json.Unmarshall(input, &residence)
+```
+
+Since you've implemented the `json.Unmarshaler` interface, your function `UnmarshalJSON` will get called to handle the unmarshalling. This will happen even this is buried within a larger JSON document.
+
+Alternately, you can call the polymorphic unmarshalling yourself:
+
+```go
+var residence Residence
+err := poly.Unmarshall(input, &residence)
+```
+
 This library knows how to deal with slices of objects, in which case the newly unmarshalled object is appended to the slice. If it's a struct type, or a pointer to a struct type, then it's simply assigned. If there are multiple instances that are unmarshalled of a scalar type, the last one wins as it will simply overwrite the earlier ones.
 
 #### Type Lookups
@@ -132,6 +148,10 @@ The `SetIndex(index int)` will be called after the object is unmarshalled with t
 ### Marshalling
 
 You can call the `poly.Marshall` function to marshall everything back to JSON. This will flatten everything back to a slice that can be marshalled back into a JSON array.
+
+As with the unmarshalling, implementing the `json.Marshaler` interface will trigger the `MarshalJSON` function to be called in the marshalling process. Then when calling `json.Marshall` your function will be called to handle the marshalling, and the polymorphic JSON will be emitted.
+
+As before, you can still call `poly.Marshall` to manually perform this as well without implementing any interface, but then it will not participate in the normal `json.Marshall` behavior.
 
 #### Indexing
 
