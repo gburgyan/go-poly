@@ -68,7 +68,7 @@ Take this JSON for example that might define a residence:
 ]
 ```
 
-Using `go-poly` you can marshall and unmarshall this:
+Using `go-poly` you can marshall and unmarshall like this:
 
 ```go
 type Residence struct {
