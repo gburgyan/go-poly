@@ -9,11 +9,11 @@
 
 ## Features
 
-- Easy marshalling and unmarshalling of polymorphic JSON
-- Support for custom types
-- Minimal dependencies and efficient performance
-- Flexible usage patterns
-- Does not lose any context from the original, even indexes are preserved
+* Simplified marshalling and unmarshalling of polymorphic JSON
+* Support for custom types
+* Minimal dependencies and efficient performance
+* Flexible usage patterns
+* Preservation of original context, including indexes
 
 ## Installation
 
@@ -25,9 +25,9 @@ go get -u github.com/gburgyan/go-poly
 
 ## Usage
 
-Polymorphic JSON exists due to the dynamic nature and flexibility of JSON data structures, allowing objects to have varying structures within a single collection. This can be useful when dealing with diverse data sources, evolving APIs, or when trying to maintain backward compatibility. Go isn't good at dealing with these JSON structures because it doesn't have a native handling of polymorphism.
+Polymorphic JSON allows objects to have varying structures within a single collection due to the dynamic nature and flexibility of JSON data structures. This is useful when dealing with diverse data sources, evolving APIs, or maintaining backward compatibility. However, Go lacks native support for handling polymorphic JSON structures.
 
-This library aims to solve that by allowing the marshalling and unmarshalling of these JSONs easily without writing custom functions to deal with this.
+`go-poly` aims to address this limitation by enabling easy marshalling and unmarshalling of polymorphic JSONs without the need for custom functions.
 
 ### Unmarshalling
 
@@ -115,14 +115,14 @@ err := json.Unmarshall(input, &residence)
 
 Since you've implemented the `json.Unmarshaler` interface, your function `UnmarshalJSON` will get called to handle the unmarshalling. This will happen even this is buried within a larger JSON document.
 
-Alternately, you can call the polymorphic unmarshalling yourself:
+Alternately, you can call the polymorphic unmarshalling directly:
 
 ```go
 var residence Residence
 err := poly.Unmarshall(input, &residence)
 ```
 
-This library knows how to deal with slices of objects, in which case the newly unmarshalled object is appended to the slice. If it's a struct type, or a pointer to a struct type, then it's simply assigned. If there are multiple instances that are unmarshalled of a scalar type, the last one wins as it will simply overwrite the earlier ones.
+This library handles slices of objects by appending newly unmarshalled objects to the slice. For struct types or pointers to struct types, they are simply assigned. If multiple instances of a scalar type are unmarshalled, the last instance will overwrite earlier ones.
 
 #### Type Lookups
 
@@ -133,37 +133,35 @@ The default implementation uses the `GenericTypeLocator` which looks for common 
 * @type
 * @Type
 
-If you need to do something special, pass in a `Type` that implements `TypeLocator` to `UnmarshallCustom`. What will happen is the JSON will first be unmarshalled into a slice of your type, then each instance of that will be used to determine the type of object to actually unmarshall.
+For custom implementations, provide a `Type` that implements the `TypeLocator` interface and pass it to `UnmarshalCustom`. During the unmarshalling process, the JSON will first be converted into a slice of your custom type. Subsequently, each instance in the slice will be used to determine the actual object type for unmarshalling. This approach offers flexibility, allowing your implementation to perform any necessary actions to identify the correct type. For example, if you need to examine multiple JSON fields to determine the concrete type, your custom implementation can handle that.
 
 #### Finding the correct target field
 
-The returned type name is used to figure out what field in the target object will get filled. If there is no `poly` tag on a field, the name of the field is used verbatim. If the field has a `poly tag, then that is used to find the correct field.
+The returned type name is used to figure out what field in the target object will get filled. If there is no `poly` tag on a field, the name of the field is used verbatim. If the field has a `poly` tag, then that is used to find the correct field.
 
 #### Indexing
 
-While not typical, sometimes the ordering of the elements in the JSON array is important. In that case, implement the `IndexSettable` interface by the types that are being deserialized.
+In cases where the order of elements in the JSON array is important, implement the `IndexSettable` interface for the types being deserialized.
 
-The `SetIndex(index int)` will be called after the object is unmarshalled with the zero-based index of the JSON array from which it was unmarshalled from.
+After unmarshalling, the `SetIndex(index int)` function will be called with the zero-based index of the JSON array from which the object was unmarshalled.
 
 ### Marshalling
 
-You can call the `poly.Marshall` function to marshall everything back to JSON. This will flatten everything back to a slice that can be marshalled back into a JSON array.
+As with unmarshalling, implementing the `json.Marshaler` interface will trigger the `MarshalJSON` function during the marshalling process. When calling `json.Marshal`, your function will handle marshalling, and the polymorphic JSON will be emitted.
 
-As with the unmarshalling, implementing the `json.Marshaler` interface will trigger the `MarshalJSON` function to be called in the marshalling process. Then when calling `json.Marshall` your function will be called to handle the marshalling, and the polymorphic JSON will be emitted.
-
-As before, you can still call `poly.Marshall` to manually perform this as well without implementing any interface, but then it will not participate in the normal `json.Marshall` behavior.
+You can also manually call `poly.Marshal` without implementing any interface, but this method will not participate in the standard json.Marshal behavior.
 
 #### Indexing
 
-Similar to the unmarshalling, sometimes the order in which the elements of the JSON array appear is important. If this is important to you, simply implement the `IndexGettable` interface with your object. The `GetIndex()` will be called to determine the relative index.
+Similar to unmarshalling, the order of elements in the JSON array may be important during marshalling. To maintain the desired order, implement the `IndexGettable` interface for your object. The `GetIndex()` function will be called to determine the relative index.
 
-If there are multiple elements that return the same index, they will all be grouped together. The order in which they were encountered will be preserved within the same returned index.
+If multiple elements return the same index, they will be grouped together, and the order in which they were encountered will be preserved within the same returned index.
 
-If there are some objects that don't implement the `IndexGettable` interface, they will simply be sorted to the end.
+Objects that do not implement the IndexGettable interface will be sorted to the end of the array.
 
 #### Limitation
 
-There is no magic to emit any sort of type field in the marshalled JSON. If you need to have a type discriminator in the JSON, you must have that field on the objects that are being marshalled with the value set appropriately.
+The library does not automatically emit a type field in the marshalled JSON. If you require a type discriminator in the JSON, include an appropriate field with the correct value in the objects being marshalled, as shown below:
 
 ```go
 type JsonObject struct {
@@ -172,7 +170,7 @@ type JsonObject struct {
 }
 ```
 
-Without the `Type` field, or something like it, there will not be a type marshalled in the JSON. 
+Without the `Type` field, or a similar field, the type will not be marshalled in the JSON.
 
 ## License
 
