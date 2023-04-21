@@ -79,7 +79,7 @@ type Residence struct {
 }
 
 func (r *Residence) UnmarshalJSON(rawJson []byte) error {
-    return Unmarshall(rawJson, r)
+    return Unmarshal(rawJson, r)
 }
 
 func (r Residence) MarshalJSON() ([]byte, error) {
@@ -110,16 +110,16 @@ You can then unmarshall the JSON into your object by:
 
 ```go
 var residence Residence
-err := json.Unmarshall(input, &residence)
+err := json.Unmarshal(input, &residence)
 ```
 
-Since you've implemented the `json.Unmarshaler` interface, your function `UnmarshallJSON` will get called to handle the unmarshalling. This will happen even this is buried within a larger JSON document.
+Since you've implemented the `json.Unmarshaler` interface, your function `UnmarshalJSON` will get called to handle the unmarshalling. This will happen even this is buried within a larger JSON document.
 
 Alternately, you can call the polymorphic unmarshalling directly:
 
 ```go
 var residence Residence
-err := poly.Unmarshall(input, &residence)
+err := poly.Unmarshal(input, &residence)
 ```
 
 This library handles slices of objects by appending newly unmarshalled objects to the slice. For struct types or pointers to struct types, they are simply assigned. If multiple instances of a scalar type are unmarshalled, the last instance will overwrite earlier ones.
@@ -133,7 +133,7 @@ The default implementation uses the `GenericTypeLocator` which looks for common 
 * @type
 * @Type
 
-For custom implementations, provide a `Type` that implements the `TypeLocator` interface and pass it to `UnmarshallCustom`. During the unmarshalling process, the JSON will first be converted into a slice of your custom type. Subsequently, each instance in the slice will be used to determine the actual object type for unmarshalling. This approach offers flexibility, allowing your implementation to perform any necessary actions to identify the correct type. For example, if you need to examine multiple JSON fields to determine the concrete type, your custom implementation can handle that.
+For custom implementations, provide a `Type` that implements the `TypeLocator` interface and pass it to `UnmarshalCustom`. During the unmarshalling process, the JSON will first be converted into a slice of your custom type. Subsequently, each instance in the slice will be used to determine the actual object type for unmarshalling. This approach offers flexibility, allowing your implementation to perform any necessary actions to identify the correct type. For example, if you need to examine multiple JSON fields to determine the concrete type, your custom implementation can handle that.
 
 #### Finding the correct target field
 
