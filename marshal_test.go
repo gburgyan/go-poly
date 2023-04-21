@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestMarshallPoly(t *testing.T) {
+func TestMarshalPoly(t *testing.T) {
 	in := SlicesABC{
 		TypeString: []TypeString{
 			{
@@ -33,11 +33,11 @@ func TestMarshallPoly(t *testing.T) {
 		},
 	}
 
-	bytes, err := Marshall(in)
+	bytes, err := Marshal(in)
 	assert.NoError(t, err)
 	assert.Equal(t, `[{"ValueC":105},{"ValueC":23},{"ValueA":"A"},{"ValueA":"B"},{"ValueB":42},{"ValueB":43}]`, string(bytes))
 
-	bytes, err = Marshall(&in) // Try with pointer
+	bytes, err = Marshal(&in) // Try with pointer
 	assert.NoError(t, err)
 	assert.Equal(t, `[{"ValueC":105},{"ValueC":23},{"ValueA":"A"},{"ValueA":"B"},{"ValueB":42},{"ValueB":43}]`, string(bytes))
 }

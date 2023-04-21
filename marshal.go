@@ -13,7 +13,7 @@ type IndexGettable interface {
 
 var indexGettableType = reflect.TypeOf([]IndexGettable{}).Elem()
 
-// Marshall takes an input object of any type and serializes it into a JSON
+// Marshal takes an input object of any type and serializes it into a JSON
 // byte array. The function flattens the input object by extracting its fields
 // and appending them to a slice. For fields of slice types, the function appends
 // individual non-zero elements of the slice to the resulting flattened slice.
@@ -44,7 +44,7 @@ var indexGettableType = reflect.TypeOf([]IndexGettable{}).Elem()
 // based on the index provided by the IndexGettable interface. This function is
 // useful for situations where a more compact or custom JSON representation is
 // desired for complex data structures.
-func Marshall(obj any) ([]byte, error) {
+func Marshal(obj any) ([]byte, error) {
 	flattenedObjs := Flatten(obj)
 
 	return json.Marshal(flattenedObjs)
@@ -61,10 +61,10 @@ func Marshall(obj any) ([]byte, error) {
 // that does not implement the IndexGettable interface will be sorted to the end
 // using the same rules.
 //
-// This does not marshall them into JSON, unlike Marshall, and can be used
+// This does not marshal them into JSON, unlike Marshal, and can be used
 // if there is a need to do any custom JSON serialization by your own code.
 //
-// As in Marshall, the objects, when serialized to JSON by your code will
+// As in Marshal, the objects, when serialized to JSON by your code will
 // need to have a field indicating the polymorphic type if you need that represented
 // in the output JSON.
 //

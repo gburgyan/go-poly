@@ -14,11 +14,11 @@ type Residence struct {
 }
 
 func (r *Residence) UnmarshalJSON(rawJson []byte) error {
-	return Unmarshall(rawJson, r)
+	return Unmarshal(rawJson, r)
 }
 
 func (r Residence) MarshalJSON() ([]byte, error) {
-	return Marshall(r)
+	return Marshal(r)
 }
 
 type Location struct {
@@ -75,9 +75,9 @@ func TestExampleUnmarshall(t *testing.T) {
   }
 ]`
 
-	// First do it manually using the library Unmarshall function
+	// First do it manually using the library Unmarshal function
 	r := Residence{}
-	err := Unmarshall([]byte(in), &r)
+	err := Unmarshal([]byte(in), &r)
 	assert.NoError(t, err)
 	assert.Equal(t, "123 Main", r.Location.Address)
 	assert.Len(t, r.People, 2)

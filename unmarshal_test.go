@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestUnmarshall(t *testing.T) {
+func TestUnmarshal(t *testing.T) {
 	in := `
 [
 	{
@@ -32,7 +32,7 @@ func TestUnmarshall(t *testing.T) {
 ]`
 	var result SlicesABC
 
-	err := Unmarshall([]byte(in), &result)
+	err := Unmarshal([]byte(in), &result)
 	assert.NoError(t, err)
 
 	assert.Len(t, result.TypeString, 2)
@@ -46,7 +46,7 @@ func TestUnmarshall(t *testing.T) {
 	assert.Equal(t, 4, result.TypeIntP.index)
 }
 
-func TestUnmarshall_BadLocator(t *testing.T) {
+func TestUnmarshal_BadLocator(t *testing.T) {
 	in := `
 [
 	{
@@ -57,11 +57,11 @@ func TestUnmarshall_BadLocator(t *testing.T) {
 	var result SlicesABC
 
 	// string doesn't implement the TypeLocator interface.
-	err := UnmarshallCustom([]byte(in), &result, reflect.TypeOf(""))
+	err := UnmarshalCustom([]byte(in), &result, reflect.TypeOf(""))
 	assert.Error(t, err)
 }
 
-func TestUnmarshall_JSONError(t *testing.T) {
+func TestUnmarshal_JSONError(t *testing.T) {
 	in := `
 [
 	{
@@ -72,18 +72,18 @@ func TestUnmarshall_JSONError(t *testing.T) {
 	var result SlicesABC
 
 	// string doesn't implement the TypeLocator interface.
-	err := Unmarshall([]byte(in), &result)
+	err := Unmarshal([]byte(in), &result)
 	assert.Error(t, err)
 }
 
-func TestUnmarshall_InvalidJSON(t *testing.T) {
+func TestUnmarshal_InvalidJSON(t *testing.T) {
 	var result SlicesABC
-	err := Unmarshall([]byte(`not valid JSON`), &result)
+	err := Unmarshal([]byte(`not valid JSON`), &result)
 
 	assert.Error(t, err)
 }
 
-func TestUnmarshall_NoType(t *testing.T) {
+func TestUnmarshal_NoType(t *testing.T) {
 	in := `
 [
 	{
@@ -93,16 +93,16 @@ func TestUnmarshall_NoType(t *testing.T) {
 	var result SlicesABC
 
 	// string doesn't implement the TypeLocator interface.
-	err := Unmarshall([]byte(in), &result)
+	err := Unmarshal([]byte(in), &result)
 	assert.NoError(t, err)
 	assert.Len(t, result.TypeString, 0)
 	assert.Len(t, result.TypeBravo, 0)
 	assert.Nil(t, result.TypeIntP)
 }
 
-func TestUnmarshall_NilSON(t *testing.T) {
+func TestUnmarshal_NilSON(t *testing.T) {
 	var result SlicesABC
-	err := Unmarshall(nil, &result)
+	err := Unmarshal(nil, &result)
 
 	assert.NoError(t, err)
 	assert.Len(t, result.TypeString, 0)
@@ -110,9 +110,9 @@ func TestUnmarshall_NilSON(t *testing.T) {
 	assert.Nil(t, result.TypeIntP)
 }
 
-func TestUnmarshall_EmptyJSON(t *testing.T) {
+func TestUnmarshal_EmptyJSON(t *testing.T) {
 	var result SlicesABC
-	err := Unmarshall([]byte(`[]`), &result)
+	err := Unmarshal([]byte(`[]`), &result)
 
 	assert.NoError(t, err)
 	assert.Empty(t, result.TypeString)
@@ -120,9 +120,9 @@ func TestUnmarshall_EmptyJSON(t *testing.T) {
 	assert.Nil(t, result.TypeIntP)
 }
 
-func TestUnmarshall_NonPointer(t *testing.T) {
+func TestUnmarshal_NonPointer(t *testing.T) {
 	var result SlicesABC
-	err := Unmarshall([]byte(`[]`), result)
+	err := Unmarshal([]byte(`[]`), result)
 
 	assert.Error(t, err)
 }

@@ -68,7 +68,7 @@ Take this JSON for example that might define a residence:
 ]
 ```
 
-Using `go-poly` you can marshall and unmarshall with a set of objects like this:
+Using `go-poly` you can marshal and unmarshal with a set of objects like this:
 
 ```go
 type Residence struct {
@@ -150,13 +150,13 @@ After unmarshalling, the `SetIndex(index int)` function will be called with the 
 As with unmarshalling, implementing the `json.Marshaler` interface will trigger the `MarshalJSON` function during the marshalling process. When calling `json.Marshal`, your function will handle marshalling, and the polymorphic JSON will be emitted.
 
 ```go
-bytes, err := json.Marshall(residence)
+bytes, err := json.Marshal(residence)
 ```
 
 You can also manually call `poly.Marshal` without implementing any interface, but this method will not participate in the standard json.Marshal behavior.
 
 ```go
-bytes, err := poly.Marshall(residence)
+bytes, err := poly.Marshal(residence)
 ```
 
 If you only need to flatten your object instead, you can call `poly.Flatten`, which does all the marshalling work without the JSON transformation. It will return a slice of `any` which you can handle however you need.
