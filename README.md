@@ -68,7 +68,7 @@ Take this JSON for example that might define a residence:
 ]
 ```
 
-Using `go-poly` you can marshall and unmarshall like this:
+Using `go-poly` you can marshall and unmarshall with a set of objects like this:
 
 ```go
 type Residence struct {
@@ -113,7 +113,7 @@ var residence Residence
 err := json.Unmarshall(input, &residence)
 ```
 
-Since you've implemented the `json.Unmarshaler` interface, your function `UnmarshalJSON` will get called to handle the unmarshalling. This will happen even this is buried within a larger JSON document.
+Since you've implemented the `json.Unmarshaler` interface, your function `UnmarshallJSON` will get called to handle the unmarshalling. This will happen even this is buried within a larger JSON document.
 
 Alternately, you can call the polymorphic unmarshalling directly:
 
@@ -133,7 +133,7 @@ The default implementation uses the `GenericTypeLocator` which looks for common 
 * @type
 * @Type
 
-For custom implementations, provide a `Type` that implements the `TypeLocator` interface and pass it to `UnmarshalCustom`. During the unmarshalling process, the JSON will first be converted into a slice of your custom type. Subsequently, each instance in the slice will be used to determine the actual object type for unmarshalling. This approach offers flexibility, allowing your implementation to perform any necessary actions to identify the correct type. For example, if you need to examine multiple JSON fields to determine the concrete type, your custom implementation can handle that.
+For custom implementations, provide a `Type` that implements the `TypeLocator` interface and pass it to `UnmarshallCustom`. During the unmarshalling process, the JSON will first be converted into a slice of your custom type. Subsequently, each instance in the slice will be used to determine the actual object type for unmarshalling. This approach offers flexibility, allowing your implementation to perform any necessary actions to identify the correct type. For example, if you need to examine multiple JSON fields to determine the concrete type, your custom implementation can handle that.
 
 #### Finding the correct target field
 
@@ -149,7 +149,17 @@ After unmarshalling, the `SetIndex(index int)` function will be called with the 
 
 As with unmarshalling, implementing the `json.Marshaler` interface will trigger the `MarshalJSON` function during the marshalling process. When calling `json.Marshal`, your function will handle marshalling, and the polymorphic JSON will be emitted.
 
+```go
+bytes, err := json.Marshall(residence)
+```
+
 You can also manually call `poly.Marshal` without implementing any interface, but this method will not participate in the standard json.Marshal behavior.
+
+```go
+bytes, err := poly.Marshall(residence)
+```
+
+If you only need to flatten your object instead, you can call `poly.Flatten`, which does all the marshalling work without the JSON transformation. It will return a slice of `any` which you can handle however you need.
 
 #### Indexing
 
