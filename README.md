@@ -20,7 +20,7 @@
 To install `go-poly`, use the following command:
 
 ```sh
-go get -u github.com/gburgyan/go-poly
+go get github.com/gburgyan/go-poly
 ```
 
 ## Usage

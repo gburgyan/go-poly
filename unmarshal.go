@@ -50,9 +50,10 @@ func (t *GenericTypeLocator) TypeName() string {
 	return ""
 }
 
-// IndexSettable is an interface that you should implement if you need to know the
-// index into the array of JSON sub-objects. This should be implemented by the
-// types that are referred to by the TypeLocator.
+// IndexSettable is an interface that should be implemented if you need to know
+// the index into the array of JSON sub-objects. If the objects created by the
+// unmarshaller implement this interface, then the index will be set on the
+// object during the unmarshalling process.
 type IndexSettable interface {
 	// SetIndex is called with the zero-based index into the JSON sub-object.
 	// In cases where there are sub-objects that cannot be unmarshalled, those

@@ -7,11 +7,22 @@ import (
 	"sort"
 )
 
+// IndexGettable is an interface that can optionally be implemented by objects
+// that can provide an index that will be used to control the ordering of the
+// objects in the JSON array.
 type IndexGettable interface {
 	GetIndex() int
 }
 
 var indexGettableType = reflect.TypeOf([]IndexGettable{}).Elem()
+
+// indexedObject is a wrapper around the value type that also contains
+// the index of the object. This is used to sort the objects based on the index
+// provided by the IndexGettable interface.
+type indexedObject struct {
+	Index int
+	Value any
+}
 
 // Marshal takes an input object of any type and serializes it into a JSON
 // byte array. The function flattens the input object by extracting its fields
@@ -76,7 +87,6 @@ func Marshal(obj any) ([]byte, error) {
 // - ([]any): A flattened representation of the input object with all the
 // fields of the original object returned as a slice.
 func Flatten(obj any) []any {
-	var flattenedObjs []any
 
 	sourceType := reflect.TypeOf(obj)
 	sourceValue := reflect.ValueOf(obj)
@@ -87,6 +97,7 @@ func Flatten(obj any) []any {
 	}
 
 	needToSort := false
+	indexedObjects := make([]indexedObject, 0)
 
 	for i := 0; i < sourceType.NumField(); i++ {
 		field := sourceType.Field(i)
@@ -114,35 +125,47 @@ func Flatten(obj any) []any {
 			for i := 0; i < fieldValue.Len(); i++ {
 				sliceVal := fieldValue.Index(i)
 				if !sliceVal.IsZero() {
-					if sliceVal.CanConvert(indexGettableType) {
-						needToSort = true
-					}
-					flattenedObjs = append(flattenedObjs, sliceVal.Interface())
+					indexedObject, itemSortable := indexedObjectForValue(sliceVal)
+					needToSort = needToSort || itemSortable
+					indexedObjects = append(indexedObjects, indexedObject)
 				}
 			}
 		} else {
 			if !zeroObj {
-				if fieldValue.CanConvert(indexGettableType) {
-					needToSort = true
-				}
-				flattenedObjs = append(flattenedObjs, fieldValue.Interface())
+				indexedObject, itemSortable := indexedObjectForValue(fieldValue)
+				needToSort = needToSort || itemSortable
+				indexedObjects = append(indexedObjects, indexedObject)
 			}
 		}
 	}
 
 	if needToSort {
-		sort.SliceStable(flattenedObjs, func(i, j int) bool {
-			ii := math.MaxInt
-			ij := math.MaxInt
-			if indexer, ok := flattenedObjs[i].(IndexGettable); ok {
-				ii = indexer.GetIndex()
-			}
-			if indexer, ok := flattenedObjs[j].(IndexGettable); ok {
-				ii = indexer.GetIndex()
-			}
-			return ii < ij
+		sort.SliceStable(indexedObjects, func(i, j int) bool {
+			return indexedObjects[i].Index < indexedObjects[j].Index
 		})
 	}
 
+	var flattenedObjs []any
+	for _, item := range indexedObjects {
+		flattenedObjs = append(flattenedObjs, item.Value)
+	}
+
 	return flattenedObjs
+}
+
+// indexedObjectForValue takes a reflect.Value and returns a
+// indexedObject object with the value and index of the object. If the
+// object does not implement the IndexGettable interface, the index is set to
+// MaxInt and the needToSort flag is set to false.
+func indexedObjectForValue(sliceVal reflect.Value) (indexedObject, bool) {
+	sortItem := indexedObject{
+		Index: math.MaxInt,
+		Value: sliceVal.Interface(),
+	}
+	needToSort := false
+	if sliceVal.CanConvert(indexGettableType) {
+		needToSort = true
+		sortItem.Index = sliceVal.Convert(indexGettableType).Interface().(IndexGettable).GetIndex()
+	}
+	return sortItem, needToSort
 }
