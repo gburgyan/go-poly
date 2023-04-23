@@ -64,7 +64,6 @@ type IndexSettable interface {
 type fieldLookup struct {
 	index     int
 	fieldType reflect.Type
-	rootType  reflect.Type
 	kind      reflect.Kind
 	ptr       bool
 }
